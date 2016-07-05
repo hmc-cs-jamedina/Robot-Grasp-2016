@@ -6,22 +6,27 @@ TEMPLATE = app
 
 SOURCES +=  \
             main.cpp \
-            glwidget.cpp
+            glwidget.cpp \
+    objloader.cpp \
+   # texture.cpp
 
 HEADERS  += \
-            glwidget.h
+            glwidget.h \
+    objloader.hpp \
+  #  texture.hpp
 
 OTHER_FILES +=  \
                 simple.vert \
                 simple.frag
 
-RESOURCES +=    \
-                core-profile.qrc
+#RESOURCES +=    \
+ #              core-profile.qrc
 
-unix:!macx|win32: LIBS += -L$$PWD/../../../../../Qt/5.2.1/mingw48_32/lib/ -lglfw3
+unix:!macx: LIBS += -L$$PWD/../../glfw-3.2/build/src/ -lglfw3
 
-INCLUDEPATH += $$PWD/../../../../../Qt/5.2.1/mingw48_32/include
-DEPENDPATH += $$PWD/../../../../../Qt/5.2.1/mingw48_32/include
+INCLUDEPATH += $$PWD/../../glfw-3.2/build/src
+DEPENDPATH += $$PWD/../../glfw-3.2/build/src
 
-win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../Qt/5.2.1/mingw48_32/lib/glfw3.lib
-else:unix:!macx|win32-g++: PRE_TARGETDEPS += $$PWD/../../../../../Qt/5.2.1/mingw48_32/lib/libglfw3.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../glfw-3.2/build/src/libglfw3.a
+
+unix:!macx: LIBS += -lX11 -ldl -lXxf86vm -lGLEW -lXrandr -lXcursor -lXinerama

@@ -23,7 +23,9 @@ private:
     //bool prepareShaderProgram( const QString& vertexShaderPath,
 //                               const QString& fragmentShaderPath );
 
-
+    GLuint vertex_buffer_data[];
+    GLuint programID;
+    GLuint vertexbuffer;
     QGLShaderProgram m_shader;
     QGLBuffer m_vertexBuffer;
     QGLBuffer m_normalBuffer;
