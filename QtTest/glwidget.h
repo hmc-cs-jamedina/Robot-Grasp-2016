@@ -6,6 +6,12 @@
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 
+// Include GLM
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+using namespace glm;
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -18,17 +24,21 @@ protected:
     virtual void paintGL();
 
     GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path);
+    void computeMatricesFromInputs();
+    GLuint loadBMP_custom(const char * imagepath);
+    glm::mat4 getProjectionMatrix();
 
 private:
     //bool prepareShaderProgram( const QString& vertexShaderPath,
 //                               const QString& fragmentShaderPath );
 
+    glm::mat4 ProjectionMatrix;
     GLuint vertex_buffer_data[];
     GLuint programID;
     GLuint vertexbuffer;
     QGLShaderProgram m_shader;
     QGLBuffer m_vertexBuffer;
     QGLBuffer m_normalBuffer;
-};
+ };
 
 #endif // GLWIDGET_H
