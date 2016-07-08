@@ -15,6 +15,7 @@ using namespace glm;
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
+
 public:
     GLWidget( const QGLFormat& format, QWidget* parent = 0 );
 
@@ -24,21 +25,32 @@ protected:
     virtual void paintGL();
 
     GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path);
-    void computeMatricesFromInputs();
-    GLuint loadBMP_custom(const char * imagepath);
-    glm::mat4 getProjectionMatrix();
 
 private:
-    //bool prepareShaderProgram( const QString& vertexShaderPath,
-//                               const QString& fragmentShaderPath );
+    void computeMatricesFromInputs();\
+    bool loadOBJ( const char * path,
+                  std::vector<glm::vec3> & out_vertices,
+                  std::vector<glm::vec2> & out_uvs,
+                  std::vector<glm::vec3> & out_normals );
 
-    glm::mat4 ProjectionMatrix;
-    GLuint vertex_buffer_data[];
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec2> uvs;
+    std::vector<glm::vec3> normals;
+
+    GLuint uvbuffer;
+    GLuint normalbuffer;
+
     GLuint programID;
     GLuint vertexbuffer;
-    QGLShaderProgram m_shader;
     QGLBuffer m_vertexBuffer;
-    QGLBuffer m_normalBuffer;
- };
+    GLuint vertex_buffer_data[];
+
+     GLuint LightID;
+    GLuint MatrixID;
+    GLuint ViewMatrixID;
+    GLuint ModelMatrixID;
+    glm::mat4 ViewMatrix;
+    glm::mat4 ProjectionMatrix;
+};
 
 #endif // GLWIDGET_H
