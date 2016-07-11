@@ -89,5 +89,7 @@ void main(){
 							   EyeDirection_cameraspace,
 							   MaterialSpecularColor, 
 							   LightPower); 
+	
+	//	color =  texture(myTextureSampler, UV).xyz; 
 	}
 }
