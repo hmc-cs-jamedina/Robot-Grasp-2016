@@ -38,9 +38,10 @@ void main(){
         LightDirection_cameraspace = LightPosition_cameraspace + EyeDirection_cameraspace;
 
         // Normal of the the vertex, in camera space
-        Normal_cameraspace = ( V * M * vec4(vertexNormal_modelspace,0)).xyz; // Only correct if ModelMatrix does not scale the model!
-                                                                                                                                                 // Use its inverse transpose if not.
+        // Only correct if ModelMatrix does not scale the model!
+        // Use its inverse transpose if not.
+        Normal_cameraspace = ( V * M * vec4(vertexNormal_modelspace,0)).xyz;
 
-        // UV of the vertex. Ignore this for now. Will modify in fragment shader
-        UV = vertexUV;
+        // UV of the vertex. Computes normalized dot product of light direction w/ vertex normal
+        UV = vec2(1, clamp( dot(normalize(Normal_cameraspace), normalize(LightDirection_cameraspace)), 0, 1 ));
 }
