@@ -16,9 +16,10 @@ in vec3 LightDirection_cameraspace;
 out vec3 color;
 
 // Values that stay constant for the whole mesh.
+uniform sampler2D myTextureSampler;
 uniform vec3 LightPosition_worldspace;
 uniform vec3 LightColor = vec3(1);
-uniform float LightPower = 50;
+uniform float LightPower = 30;
 uniform vec3 MaterialSpecularColor = vec3(1);
 
 
@@ -72,7 +73,7 @@ vec3 gooch_shading(vec4 m_color,	//material color
 
 void main(){
 
-        if( dot(Normal_cameraspace, EyeDirection_cameraspace) < .18){
+        if( dot(Normal_cameraspace, EyeDirection_cameraspace) < .05f){
                 color = vec3(0,0,0);
         }
         else{
@@ -90,4 +91,7 @@ void main(){
                               MaterialSpecularColor,
                               LightPower);
         }
+
+       // color = texture(myTextureSampler, UV).xyz;
+
 }
