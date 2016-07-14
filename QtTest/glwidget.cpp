@@ -30,7 +30,6 @@ GLWidget::GLWidget( const QGLFormat& format, QWidget* parent )
 
 void GLWidget::initializeGL()
 {
-
 }
 
 void GLWidget::resizeGL( int w, int h )
