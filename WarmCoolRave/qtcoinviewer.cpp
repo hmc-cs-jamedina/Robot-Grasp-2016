@@ -20,6 +20,7 @@
 
 #include "qtcoin.h"
 
+
 #include <Inventor/elements/SoGLCacheContextElement.h>
 #include <Inventor/actions/SoToVRML2Action.h>
 #include <Inventor/actions/SoWriteAction.h>
@@ -51,7 +52,11 @@
 #include <qgl.h>
 #endif
 
+#include "renderToTexture.hpp"
+
 #include <locale>
+
+
 
 const float TIMER_SENSOR_INTERVAL = (1.0f/60.0f);
 
@@ -292,14 +297,6 @@ void QtCoinViewer::_InitConstructor(std::istream& sinput)
 
     _ivRoot->addChild(pmsgsep);
     _ivRoot->addChild(_ivCamera);
-
-///////////////////////
-  //Things to be sent to shaders
-//////////////////////
-
-
-
-
 
 
     /////////////////
@@ -1075,6 +1072,77 @@ GraphHandlePtr QtCoinViewer::drawplane(const RaveTransform<float>& tplane, const
     pmsg->callerexecute(false);
     return GraphHandlePtr(new PrivateGraphHandle(shared_viewer(), handle));
 }
+
+
+
+
+
+/* class depth texture 
+ * Call the external setup function
+ * call _drawtrimesh
+ * call an external unsetup function
+ */
+/* Create a class like DrawTriClass for the depth texture 
+ * Actual pointer to depth texture in qtcoinviewer
+ * the "execute" method calls the external set up texture rendering
+ *   renders using pviewer drawtrimesh
+ * By the time you come out of this the depth texture models should be there
+ * Add a release depth textures to this method*/
+class DepthTextureMessage : public QtCoinViewer::EnvMessage
+{
+public:
+    DepthTextureMessage( QtCoinViewerPtr pviewer, 
+                         SoSwitch* handle, 
+                         const float* ppoints, 
+                         int stride, 
+                         const int* pIndices, 
+                         int numTriangles, 
+                         const RaveVector<float>& color,
+                         GLuint depthTextureName )
+                        : EnvMessage(pviewer, NULL, false), _color(color), _depthTextureName(depthTextureName)
+    {
+    }//const float* ppoints, int stride, const int* pIndices, int numTriangles, const RaveVector<float>& color)
+    virtual void viewerexecute() {
+        QtCoinViewerPtr pviewer = _pviewer.lock();
+        if( !pviewer ){
+            return;
+        }
+        else{
+            //Get light position for use in depth buffering
+            GLint* _light_pos = 0;
+            glGetLightiv(GL_LIGHT0, GL_POSITION, _light_pos);
+
+            setUpRenderToFrameBuffer(_light_pos, _depthTextureName, FramebufferName);
+            void* ret = pviewer->_drawtrimesh( _handle,
+                                                 _ppoints, 
+                                                 _stride, 
+                                                 _pIndices, 
+                                                 _numTriangles, 
+                                                 _color);
+
+            UnsetupRenderToFrameBuffer();        
+        }
+        EnvMessage::viewerexecute();
+    }
+private:
+GLuint FramebufferName = 0;
+GLuint depthTexture = 0;
+    SoSwitch* _handle;
+    GLuint _depthTextureName;
+    float* _ppoints;
+    int _stride;
+    const int* _pIndices;
+    int _numTriangles;
+    RaveVector<float> _color;
+};
+
+
+
+
+
+
+
+
 
 class DrawTriMeshMessage : public QtCoinViewer::EnvMessage
 {
@@ -2480,12 +2548,6 @@ int QtCoinViewer::main(bool bShow)
 {
     _nQuitMainLoop = -1;
     _StartPlaybackTimer();
-
-
-
-
-
-
 
     // need the _nQuitMainLoop in case _pviewer->show() exits after a quitmainloop is called
     if( bShow ) {
